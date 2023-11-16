@@ -1,45 +1,47 @@
-class Mutations::CreateNote < Mutations::BaseMutation
+module Mutations
+  class CreateNote < Mutations::BaseMutation
+    argument :input, Types::NoteInputType, required: true
 
-  argument :text, String, required: true
+    field :note, Types::NoteType, null: false
+    field :errors, [String], null: false
 
-  field :note, Types::NoteType, null: false
-  field :errors, [String], null: false
+    def resolve(input:)
+      note = Note.new(text: input[:text])
 
-  def resolve(text:)
-    note = Note.new(text: text)
-    if note.save
-      # Successful creation, return the created object with no errors
-      {
-        note: note,
-        errors: []
-      }
-    else
-      # Failed save, return the errors to the client
-      {
-        note: nil,
-        errors: note.errors.full_messages
-      }
+      if note.save
+        handle_children(note, input[:children]) if input[:children].present?
+
+        {
+          note: note,
+          errors: []
+        }
+      else
+        {
+          note: nil,
+          errors: note.errors.full_messages
+        }
+      end
+    end
+
+    private
+
+    def handle_children(parent_note, children)
+      children.each do |child_input|
+        child_note = create_or_find_child_note(child_input[:note])
+
+        NoteRelation.create!(parent_note_id: parent_note.id, child_note_id: child_note.id)
+
+        if child_input[:note][:children].present?
+          handle_children(child_note, child_input[:note][:children])
+        end
+      end
+    end
+
+    def create_or_find_child_note(note_input)
+      child_note = note_input[:id] ? Note.find_or_initialize_by(id: note_input[:id]) : Note.new
+      child_note.text = note_input[:text]
+      child_note.save!
+      child_note
     end
   end
 end
-
-{
-  text: "this is the parent"
-  children: [
-    {
-      relationship: "child",
-      note: {
-        text: "This is a child note"
-        children: [
-          {
-            relationship: "child",
-            note: {
-              id: "uuid"
-              text: "This is a child of a child. This note is expected to already exist in the db with the provided id. If it doesn't exist then it should be created with a newly generated uuid"
-            }
-          }
-        ]
-      }
-    }
-  ] 
-}
