@@ -21,10 +21,17 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
-    field :notes, [Types::NoteType], null: false
+    field :notes, [Types::NoteType], null: false do
+      argument :checkpoint, String, required: false
+    end
 
-    def notes
-      Note.all
+    def notes(checkpoint: nil)
+      if checkpoint
+        #find all notes created or updated after the checkpoint timestamp
+        Note.where("created_at > ? OR updated_at > ?", checkpoint, checkpoint)
+      else
+        Note.all
+      end
     end
   end
 end
