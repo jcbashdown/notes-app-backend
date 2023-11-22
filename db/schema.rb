@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_15_122655) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_22_122655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,6 +29,4 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_15_122655) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "note_relations", "notes", column: "child_note_id"
-  add_foreign_key "note_relations", "notes", column: "parent_note_id"
 end
