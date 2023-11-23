@@ -6,5 +6,6 @@ module Types
     argument :id, String, required: true 
     argument :child_ids, [String], required: false
     argument :parent_ids, [String], required: false
+    argument :_deleted, Boolean , required: false
   end
 end
