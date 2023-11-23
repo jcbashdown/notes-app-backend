@@ -1,3 +1,5 @@
+require 'ostruct'
+
 module Mutations
   module Notes 
     class SyncNotes < GraphQL::Schema::Mutation
@@ -22,7 +24,13 @@ module Mutations
 
       def process_note_change(change)
         master_note = Note.find_by(id: change.assumed_master_state&.id)
-        return master_note if master_note && !master_note_matches?(master_note, change.assumed_master_state)
+        #create a copy of the change.new_document_state without the _deleted key
+        #clean_new_document_state = OpenStruct.new({
+          #text: change.new_document_state.text,
+          #child_ids: change.new_document_state.child_ids,
+          #parent_ids: change.new_document_state.parent_ids,
+        #})
+        return master_note if master_note && !master_note_matches?(master_note, change.assumed_master_state) #&& !master_note_matches?(master_note, clean_new_document_state)
         #TODO? if the master note doesn't exist, but assumed_master_state thinks it does then this should probably also be a conflict?
 
         # If the newDocumentState has _deleted set to true, handle deletion
