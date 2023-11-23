@@ -9,11 +9,11 @@ module Types
     field :child_ids, [ID], null: true
 
     def parent_ids
-      object.parent_relations.pluck(:parent_note_id)
+      object.parent_relations&.pluck(:parent_note_id)&.compact || []
     end
 
     def child_ids
-      object.child_relations.pluck(:child_note_id)
+      object.child_relations&.pluck(:child_note_id)&.compact || []
     end
   end
 end

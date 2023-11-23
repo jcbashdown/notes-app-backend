@@ -23,6 +23,13 @@ module Mutations
       def process_note_change(change)
         master_note = Note.find_by(id: change.assumed_master_state&.id)
         return master_note if master_note && !master_note_matches?(master_note, change.assumed_master_state)
+        #TODO? if the master note doesn't exist, but assumed_master_state thinks it does then this should probably also be a conflict?
+
+        # If the newDocumentState has _deleted set to true, handle deletion
+        if change.new_document_state&._deleted
+          handle_deletion(change.new_document_state.id)
+          return nil
+        end
 
         note = Note.find_or_initialize_by(id: change.new_document_state.id)
         note.text = change.new_document_state.text
@@ -58,6 +65,15 @@ module Mutations
         (current_child_ids - state.child_ids).each do |child_id|
           note.child_relations.where(child_note_id: child_id).delete_all
         end
+      end
+      def handle_deletion(note_id)
+        note = Note.find_by(id: note_id)
+        return unless note
+        note.parent_relations.delete_all
+        note.child_relations.delete_all
+
+        # Delete the note and its relations
+        note.destroy
       end
     end
   end
