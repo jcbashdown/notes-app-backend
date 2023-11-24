@@ -21,7 +21,7 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
-    field :notes, [Types::NoteType], null: false
+    field :notes, [Types::Notes::NoteType], null: false
 
     def notes()
       Note.all

@@ -7,7 +7,7 @@ module Mutations
 
       argument :changes, [Types::Notes::NoteChangeInputType], required: true
 
-      field :conflicts, [Types::FlatNoteType], null: false
+      field :conflicts, [Types::Notes::FlatNoteType], null: false
 
       def resolve(changes:)
         conflicts = []
