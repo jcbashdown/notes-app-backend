@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class NotesAppBackendSchema < GraphQL::Schema
+
+  use GraphQL::Subscriptions::ActionCableSubscriptions
+
   mutation(Types::MutationType)
   query(Types::QueryType)
+  subscription(Types::SubscriptionType)
 
   # For batch-loading (see https://graphql-ruby.org/dataloader/overview.html)
   use GraphQL::Dataloader

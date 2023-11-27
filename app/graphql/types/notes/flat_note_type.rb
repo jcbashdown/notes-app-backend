@@ -8,6 +8,7 @@ module Types
       field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
       field :parent_ids, [ID], null: true
       field :child_ids, [ID], null: true
+      field :_deleted, Boolean, null: true
 
       def parent_ids
         object.parent_relations&.pluck(:parent_note_id)&.compact || []

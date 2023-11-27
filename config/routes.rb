@@ -14,4 +14,7 @@ Rails.application.routes.draw do
   
   # An API stub endpoint that returns the request body as JSON
   post '/api-stub', to: 'api_stub#echo'
+
+  # Action Cable endpoint for notes websocket
+  mount ActionCable.server => '/cable'
 end

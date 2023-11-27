@@ -3,4 +3,5 @@
 class NoteRelation < ApplicationRecord
   belongs_to :parent_note, class_name: 'Note'
   belongs_to :child_note, class_name: 'Note'
+
 end
