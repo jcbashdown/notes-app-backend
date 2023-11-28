@@ -1,4 +1,4 @@
-class NotesChannel < ApplicationCable::Channel
+class GraphqlChannel < ApplicationCable::Channel
   def subscribed
     # Store all GraphQL subscriptions the consumer is listening for on this channel
     @subscription_ids = []
@@ -13,15 +13,18 @@ class NotesChannel < ApplicationCable::Channel
     operation_name = data["operationName"]
     context = {
       channel: self,
-      current_application_context: connection.current_application_context
+      #current_application_context: connection.current_application_context
     }
 
-    result = Schema.execute({
+    Rails.logger.info "QUERY" 
+    Rails.logger.info query 
+    result = NotesAppBackendSchema.execute(
       query: query,
       context: context,
       variables: variables,
       operation_name: operation_name,
-    })
+    )
+    Rails.logger.info "AFTER" 
 
     payload = {
       result: result.to_h,
@@ -37,7 +40,7 @@ class NotesChannel < ApplicationCable::Channel
   def unsubscribed
     # Delete all of the consumer's subscriptions from the GraphQL Schema
     @subscription_ids.each do |sid|
-      Schema.subscriptions.delete_subscription(sid)
+      NotesAppBackendSchema.subscriptions.delete_subscription(sid)
     end
   end
 

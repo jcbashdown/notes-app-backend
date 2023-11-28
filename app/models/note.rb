@@ -8,14 +8,26 @@ class Note < ApplicationRecord
   after_save :broadcast_note_change
   after_destroy :broadcast_note_deletion
 
+  def parent_ids
+    parent_relations.pluck(:parent_note_id)
+  end
+
+  def child_ids
+    child_relations.pluck(:child_note_id)
+  end
+
   private
 
   def broadcast_note_change
     note = {
-      id: self.id,
-      text: self.text,
-      child_ids: self.child_relations.pluck(:child_note_id),
-      parent_ids: self.parent_relations.pluck(:parent_note_id)
+      note_changes: {
+        documents: {
+          id: self.id,
+          text: self.text,
+          child_ids: self.child_relations.pluck(:child_note_id),
+          parent_ids: self.parent_relations.pluck(:parent_note_id)
+        }
+      }
     }
     #Subscriptions::Notes::NoteChanged.trigger("noteChanged", {}, { note_changes: {checkpoint: DateTime.now.iso8601, documents: [note]}})
     NotesAppBackendSchema.subscriptions.trigger(
@@ -26,11 +38,15 @@ class Note < ApplicationRecord
   end
   def broadcast_note_deletion
     note = {
-      id: self.id,
-      text: self.text,
-      child_ids: self.child_relations.pluck(:child_note_id),
-      parent_ids: self.parent_relations.pluck(:parent_note_id),
-      _deleted: true
+      note_changes: {
+        documents: {
+          id: self.id,
+          text: self.text,
+          child_ids: self.child_relations.pluck(:child_note_id),
+          parent_ids: self.parent_relations.pluck(:parent_note_id),
+          _deleted: true
+        }
+      }
     }
     NotesAppBackendSchema.subscriptions.trigger(
       :note_changed,  # Field name

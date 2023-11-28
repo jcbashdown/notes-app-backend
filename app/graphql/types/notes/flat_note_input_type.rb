@@ -5,8 +5,8 @@ module Types
 
       argument :text, String, required: true
       argument :id, String, required: true 
-      argument :child_ids, [String], required: false
-      argument :parent_ids, [String], required: false
+      argument :child_ids, [String], required: false, default_value: []
+      argument :parent_ids, [String], required: false, default_value: []
       argument :_deleted, Boolean , required: false
     end
   end
