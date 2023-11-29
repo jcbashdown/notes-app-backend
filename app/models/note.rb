@@ -25,7 +25,9 @@ class Note < ApplicationRecord
           id: self.id,
           text: self.text,
           child_ids: self.child_relations.pluck(:child_note_id),
-          parent_ids: self.parent_relations.pluck(:parent_note_id)
+          parent_ids: self.parent_relations.pluck(:parent_note_id),
+          created_at: self.created_at.iso8601,
+          updated_at: self.updated_at.iso8601
         }
       }
     }
@@ -44,6 +46,8 @@ class Note < ApplicationRecord
           text: self.text,
           child_ids: self.child_relations.pluck(:child_note_id),
           parent_ids: self.parent_relations.pluck(:parent_note_id),
+          created_at: self.created_at.iso8601,
+          updated_at: self.updated_at.iso8601,
           _deleted: true
         }
       }

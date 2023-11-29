@@ -39,8 +39,14 @@ module Mutations
           return nil
         end
 
+        #return nil if the text is empty
+        if change.new_document_state.text.empty?
+          return nil
+        end
+
         note = Note.find_or_initialize_by(id: change.new_document_state.id)
         note.text = change.new_document_state.text
+        note.created_at = change.new_document_state.created_at
         note.save!
 
         update_relations(note, change.new_document_state)
